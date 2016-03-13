@@ -61,21 +61,29 @@ img {
 
 
 
-<div id="get-clean-data" class="section level1">
-<h1>get-clean-data</h1>
-<p>Getting and Cleaning Data - coursera</p>
+<div id="getting-and-cleaning-data" class="section level1">
+<h1>Getting and Cleaning Data</h1>
+<div id="files" class="section level2">
+<h2>Files</h2>
+<ul>
+<li><code>CodeBook.md</code>: Code book describing the data set resulting from the analysis required for the assignment.</li>
+<li><code>CodeBook.html</code>: HTML version of the code book.</li>
+<li><code>notebook.Rmd</code>: R markdown file describing step by step and with R code the process resulting ib the final data set.</li>
+<li><code>notebook.html</code>: HTML version of the notebook.Rmd file.</li>
+<li><code>notebokk.pdf</code>: PDF version of the notebook.Rmd file.</li>
+<li><code>run_analysis.R</code>: R script that transforms the original dataset into a tidy data set with average of each variable for each activity and each subject (see CodeBook for additional details).</li>
+</ul>
 </div>
-<div id="study-design" class="section level1">
-<h1>Study Design</h1>
-<div id="training" class="section level2">
-<h2>Training</h2>
+<div id="script-execution" class="section level2">
+<h2>Script execution</h2>
+<p>Assumptions:</p>
 <ol style="list-style-type: decimal">
-<li>something</li>
+<li>The zip file <a href="https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip">https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip</a> has been downloaded</li>
+<li>The content of the zip file has been unzipped in the project directory, such that the directory <code>UCI HAR Dataset</code> is at the same level of <code>run_analysis.R</code>. The R script will look for datasets included in directory <code>UCI HAR Dataset</code> and its subdirectories.</li>
+<li>To run the script at the command line:</li>
 </ol>
+<pre><code>$ Rscript run_analysis.R</code></pre>
 </div>
-</div>
-<div id="code-book" class="section level1">
-<h1>Code Book</h1>
 </div>
 
 
