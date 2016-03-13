@@ -1,0 +1,103 @@
+---
+title: "Assignment Getting Cleaning Data"
+author: "Andre Burgaud"
+date: "March 11, 2016"
+output: pdf_document
+---
+
+## 1 - Merge the training and the test sets to create one data set
+
+### Training Data
+
+```{r}
+library(plyr) # mapvalues
+library(dplyr)
+setwd(".")
+# Assuming the data is in the current directory
+# Load training signals in data frame
+trainSignals <- read.table("UCI HAR Dataset/train/X_train.txt", header=FALSE)
+# Load training subjects in a vector
+subject <- scan("UCI HAR Dataset/train/subject_train.txt")
+# Load training activities in a vector
+activity <- scan("UCI HAR Dataset/train/y_train.txt")
+# Add set type column (train vs. test)
+trainDF <- cbind(set="train", trainSignals)
+# Add activity column
+trainDF <- cbind(activity, trainDF)
+# Add subject column
+trainDF <- cbind(subject, trainDF)
+```
+
+### Test Data
+
+```{r}
+# Assuming the data is in the current directory
+# Load testing signals in data frame
+testSignals <- read.table("UCI HAR Dataset/test/X_test.txt", header=FALSE)
+# Load testing subjects in a vector
+subject <- scan("UCI HAR Dataset/test/subject_test.txt")
+# Load testing activities in a vector
+activity <- scan("UCI HAR Dataset/test/y_test.txt")
+# Add set type column (test vs. train)
+testDF <- cbind(set="test", testSignals)
+# Add activity column
+testDF <- cbind(activity, testDF)
+# Add subject column
+testDF <- cbind(subject, testDF)
+```
+
+### Merge Data Sets
+
+```{r}
+DF <- merge(trainDF, testDF, all=TRUE)
+str(DF)
+```
+
+## 2 - Extracts only measurements on mean and standard deviation for each measurement
+
+```{r}
+# Read the features in a table to extract features name
+features <-  read.table("UCI HAR Dataset/features.txt", header=FALSE, stringsAsFactors=FALSE)
+# Convert id value to column names matching the consolidated dataframe DF column names
+features <- mutate(features, V1=paste("V", V1, sep=""))
+# Extract only the features matching mean of std functions
+stdMeanFeatures <- features[grepl("mean\\(\\)|std\\(\\)", features$V2),]
+# Extract measurements for std and mean functions in the consolidated DF (preserve subject, activity and set)
+firstThreeCols <- names(DF)[1:3]
+stdMeanDF <- select_(DF, .dots=c(firstThreeCols, stdMeanFeatures$V1))
+str(stdMeanDF)
+```
+
+## 3 - Use descriptive activity names to name activities in the data set
+
+```{r}
+#library(plyr)
+activityDF <- read.table("UCI HAR Dataset/activity_labels.txt", header=FALSE)
+activityLabels = tolower(activityDF$V2)
+# Set descriptive activities (i.e. 1="walking", 2="walking_upstairs"...)
+stdMeanDF <- mutate(stdMeanDF, activity=mapvalues(activity, from=c(1,2,3,4,5,6), to=activityLabels))
+# convert activity variable to factor
+stdMeanDF <- mutate(stdMeanDF, activity=factor(activity, levels=tolower(activityDF$V2)))
+stdMeanDF$activity[1:30]
+```
+
+## 4 - Appropriately labels the data set with descriptive variable names
+
+```{r}
+# Remove special characters from column names (features)
+cleanFeatures <- gsub("[\\(\\)-]", "", stdMeanFeatures$V2)
+colnames(stdMeanDF) <- c(firstThreeCols, cleanFeatures)
+names(stdMeanDF)
+```
+
+## 5 - From the data set in step 4, creats a second, independent tidy data set with the average of each variable for each activity and each subject
+
+```{r}
+meanDF <- stdMeanDF %>% 
+            group_by(subject, activity, set) %>%
+            summarise_each_(funs(mean), names(stdMeanDF[4:ncol(stdMeanDF)]))
+str(meanDF)
+write.table(meanDF, file="tidy_data_set.txt", row.name=FALSE)
+```
+
+
